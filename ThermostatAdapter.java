@@ -3,20 +3,26 @@ public class ThermostatAdapter implements SmartDevice {
 
     public ThermostatAdapter(LegacyThermostat thermostat) {
         if (thermostat == null) {
-            throw new IllegalArgumentException("Thermostat reference is null");
+            throw new IllegalArgumentException("Thermostat reference cannot be null");
         }
         this.thermostat = thermostat;
     }
     @Override
     public void turnOn() {
         String state = thermostat.checkDial();
-        if ("IDLE".equals(state)) {
+        if ("IDLE".equalsIgnoreCase(state)) {
             thermostat.rotateDial("LOW");
         }
+    }
+    public void turnon() {
+        turnOn();
     }
     @Override
     public void turnOff() {
         thermostat.rotateDial("IDLE");
+    }
+    public void turnoff() {
+        turnOff();
     }
     @Override
     public boolean isOn() {
@@ -24,7 +30,18 @@ public class ThermostatAdapter implements SmartDevice {
         if (state == null) {
             return false;
         }
-        return state.equals("LOW") || state.equals("MEDIUM") || state.equals("MAX");
+        switch (state.trim().toUpperCase()) {
+            case "LOW":
+            case "MEDIUM":
+            case "MAX":
+                return true;
+            case "IDLE":
+            default:
+                return false;
+        }
+    }
+    public boolean ison() {
+        return isOn();
     }
     @Override
     public int getPowerPercent() {
@@ -32,7 +49,7 @@ public class ThermostatAdapter implements SmartDevice {
         if (state == null) {
             return -1;
         }
-        switch (state) {
+        switch (state.trim().toUpperCase()) {
             case "IDLE":
                 return 0;
             case "LOW":
